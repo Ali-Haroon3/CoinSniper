@@ -1,1 +1,1 @@
-# CoinSniper
+# CoinSniper for Phantom
