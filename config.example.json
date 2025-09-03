@@ -1,0 +1,141 @@
+{
+  "networks": {
+    "ethereum": {
+      "rpc": "https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY",
+      "chainId": 1,
+      "gasPrice": "auto",
+      "maxGasPrice": "100",
+      "priorityFee": "2"
+    },
+    "bsc": {
+      "rpc": "https://bsc-dataseed.binance.org/",
+      "chainId": 56,
+      "gasPrice": "auto",
+      "maxGasPrice": "5",
+      "priorityFee": "1.1"
+    },
+    "polygon": {
+      "rpc": "https://polygon-rpc.com/",
+      "chainId": 137,
+      "gasPrice": "auto",
+      "maxGasPrice": "200",
+      "priorityFee": "30"
+    },
+    "arbitrum": {
+      "rpc": "https://arb1.arbitrum.io/rpc",
+      "chainId": 42161,
+      "gasPrice": "auto",
+      "maxGasPrice": "0.1",
+      "priorityFee": "0.01"
+    },
+    "base": {
+      "rpc": "https://mainnet.base.org/",
+      "chainId": 8453,
+      "gasPrice": "auto",
+      "maxGasPrice": "0.01",
+      "priorityFee": "0.001"
+    }
+  },
+  "trading": {
+    "maxSlippage": 15,
+    "minLiquidity": 1000,
+    "maxBuyAmount": 0.1,
+    "minBuyAmount": 0.01,
+    "takeProfit": 300,
+    "stopLoss": 50,
+    "maxConcurrentTrades": 5,
+    "autoCompound": true,
+    "gasMultiplier": 1.2
+  },
+  "sniper": {
+    "enabled": true,
+    "scanInterval": 1000,
+    "minContractAge": 0,
+    "maxContractAge": 300,
+    "honeypotCheck": true,
+    "liquidityCheck": true,
+    "ownershipCheck": true,
+    "blacklistCheck": true,
+    "whitelistCheck": false
+  },
+  "riskManagement": {
+    "maxDailyLoss": 5,
+    "maxSingleLoss": 2,
+    "maxPortfolioRisk": 10,
+    "emergencyStop": true,
+    "autoStopLoss": true,
+    "trailingStop": true
+  },
+  "notifications": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "YOUR_BOT_TOKEN",
+      "chatId": "YOUR_CHAT_ID",
+      "notifyOnEntry": true,
+      "notifyOnExit": true,
+      "notifyOnError": true
+    },
+    "discord": {
+      "enabled": false,
+      "webhookUrl": "YOUR_WEBHOOK_URL"
+    },
+    "email": {
+      "enabled": false,
+      "smtp": {
+        "host": "smtp.gmail.com",
+        "port": 587,
+        "secure": false,
+        "auth": {
+          "user": "your-email@gmail.com",
+          "pass": "your-app-password"
+        }
+      }
+    }
+  },
+  "wallets": [
+    {
+      "name": "Main Wallet",
+      "privateKey": "YOUR_PRIVATE_KEY",
+      "address": "YOUR_WALLET_ADDRESS",
+      "maxAllocation": 50,
+      "enabled": true
+    }
+  ],
+  "dexes": {
+    "uniswap": {
+      "enabled": true,
+      "router": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "factory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+    },
+    "pancakeswap": {
+      "enabled": true,
+      "router": "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+      "factory": "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73"
+    },
+    "quickswap": {
+      "enabled": true,
+      "router": "0xa5E0829CaCEd8fFDD4De3c74796aF668a5803888",
+      "factory": "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32"
+    }
+  },
+  "ai": {
+    "enabled": true,
+    "model": "gpt-4",
+    "apiKey": "YOUR_OPENAI_API_KEY",
+    "sentimentAnalysis": true,
+    "trendPrediction": true,
+    "riskAssessment": true
+  },
+  "database": {
+    "mongoUri": "mongodb://localhost:27017/coinsniper",
+    "redisUrl": "redis://localhost:6379"
+  },
+  "api": {
+    "port": 3000,
+    "host": "0.0.0.0",
+    "rateLimit": {
+      "windowMs": 15 * 60 * 1000,
+      "max": 100
+    }
+  }
+}
