@@ -1,5 +1,6 @@
 const { ethers } = require('ethers');
 const { logger } = require('../utils/logger');
+const { getAxiomService } = require('../services/axiom');
 const { TokenAnalyzer } = require('./tokenAnalyzer');
 const { TradeExecutor } = require('./tradeExecutor');
 const { LiquidityMonitor } = require('./liquidityMonitor');
@@ -34,7 +35,10 @@ class MemecoinSniper {
     try {
       logger.info('🔍 Initializing Memecoin Sniper...');
       
-      // Initialize providers for each network
+      // Initialize Axiom service (primary data source)
+      this.axiomService = getAxiomService();
+      
+      // Initialize providers for each network (fallback)
       await this.initializeProviders();
       
       // Initialize analyzers and executors
@@ -156,17 +160,46 @@ class MemecoinSniper {
   }
 
   async scanForNewTokens() {
-    for (const [network, provider] of this.providers) {
-      try {
-        const analyzer = this.analyzers.get(network);
-        const newTokens = await analyzer.scanForNewTokens();
+    try {
+      // Use Axiom as primary data source for new token detection
+      for (const network of Object.keys(this.config.networks)) {
+        const newTokens = await this.axiomService.getNewTokens(network, '5m');
         
         for (const token of newTokens) {
           await this.analyzeAndQueueToken(token, network);
         }
-        
-      } catch (error) {
-        logger.error(`Error scanning ${network}:`, error);
+      }
+      
+      // Fallback to traditional scanning if Axiom fails
+      logger.info('🔄 Falling back to traditional scanning method');
+      for (const [network, provider] of this.providers) {
+        try {
+          const analyzer = this.analyzers.get(network);
+          const fallbackTokens = await analyzer.scanForNewTokens();
+          
+          for (const token of fallbackTokens) {
+            await this.analyzeAndQueueToken(token, network);
+          }
+        } catch (error) {
+          logger.error(`Error scanning ${network}:`, error);
+        }
+      }
+    } catch (error) {
+      logger.error('❌ Error scanning for new tokens with Axiom:', error);
+      
+      // Fallback to traditional scanning on error
+      logger.info('🔄 Falling back to traditional scanning method');
+      for (const [network, provider] of this.providers) {
+        try {
+          const analyzer = this.analyzers.get(network);
+          const fallbackTokens = await analyzer.scanForNewTokens();
+          
+          for (const token of fallbackTokens) {
+            await this.analyzeAndQueueToken(token, network);
+          }
+        } catch (fallbackError) {
+          logger.error(`❌ Fallback scanning failed for ${network}:`, error);
+        }
       }
     }
   }

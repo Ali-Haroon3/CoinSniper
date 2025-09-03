@@ -25,9 +25,10 @@
   "author": "CoinSniper Team",
   "license": "MIT",
   "dependencies": {
-    "ethers": "^6.8.1",
-    "web3": "^4.2.2",
-    "axios": "^1.6.2",
+            "ethers": "^6.8.1",
+        "web3": "^4.2.2",
+        "@axiomhq/axiom-node": "^0.1.0",
+        "axios": "^1.6.2",
     "ws": "^8.14.2",
     "node-cron": "^3.0.3",
     "dotenv": "^16.3.1",

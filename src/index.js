@@ -8,6 +8,7 @@ require('dotenv').config();
 const { logger } = require('./utils/logger');
 const { initializeDatabase } = require('./database/connection');
 const { initializeRedis } = require('./database/redis');
+const { initializeAxiom } = require('./services/axiom');
 const { initializeSniper } = require('./core/sniper');
 const { initializeNotifier } = require('./notifications/notifier');
 const { initializeAI } = require('./ai/aiManager');
@@ -52,6 +53,9 @@ class CoinSniper {
     // Initialize database connections
     await initializeDatabase();
     await initializeRedis();
+    
+    // Initialize Axiom service (primary data source)
+    await initializeAxiom();
     
     // Initialize core components
     await initializeSniper();

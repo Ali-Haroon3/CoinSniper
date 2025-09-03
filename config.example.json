@@ -1,4 +1,12 @@
 {
+  "axiom": {
+    "apiKey": "YOUR_AXIOM_API_KEY",
+    "baseUrl": "https://api.axiom.xyz",
+    "timeout": 30000,
+    "retryAttempts": 3,
+    "cacheEnabled": true,
+    "cacheTTL": 300
+  },
   "networks": {
     "ethereum": {
       "rpc": "https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY",

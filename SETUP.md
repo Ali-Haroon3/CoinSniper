@@ -38,7 +38,24 @@ nano config.json  # or use your preferred editor
 
 #### Essential Configuration Steps:
 
-1. **Add RPC Endpoints**
+1. **Axiom Setup (Primary Data Source)**
+   ```json
+   "axiom": {
+     "apiKey": "YOUR_AXIOM_API_KEY",
+     "baseUrl": "https://api.axiom.xyz",
+     "timeout": 30000,
+     "retryAttempts": 3,
+     "cacheEnabled": true,
+     "cacheTTL": 300
+   }
+   ```
+   
+   **Get your Axiom API key:**
+   - Visit [Axiom.xyz](https://axiom.xyz/)
+   - Create an account and get your API key
+   - This is the primary data source for blockchain monitoring
+
+2. **Add RPC Endpoints (Fallback)**
    ```json
    "networks": {
      "ethereum": {
@@ -94,6 +111,7 @@ MONGODB_URI=mongodb://localhost:27017/coinsniper
 REDIS_URL=redis://localhost:6379
 
 # API Keys (if using external services)
+AXIOM_API_KEY=your_axiom_api_key
 ALCHEMY_API_KEY=your_alchemy_key
 ETHERSCAN_API_KEY=your_etherscan_key
 BSCSCAN_API_KEY=your_bscscan_key
@@ -105,6 +123,21 @@ ENCRYPTION_KEY=your_encryption_key
 # Optional: OpenAI API for AI analysis
 OPENAI_API_KEY=your_openai_key
 ```
+
+### 3.5. Why Axiom?
+
+**Axiom Integration Benefits:**
+- **Real-time Data**: Instant access to blockchain events and token launches
+- **Multi-chain Support**: Unified API for Ethereum, BSC, Polygon, Arbitrum, Base
+- **Advanced Queries**: SQL-like queries for complex blockchain data analysis
+- **Performance**: Optimized indexing for fast token detection
+- **Reliability**: Enterprise-grade infrastructure with 99.9% uptime
+- **Cost-effective**: Pay-per-query model for efficient resource usage
+
+**Traditional RPC vs Axiom:**
+- **RPC**: Limited to basic blockchain queries, slower response times
+- **Axiom**: Advanced indexing, real-time feeds, complex analytics
+- **Fallback**: RPC endpoints still available as backup
 
 ### 4. Database Setup
 
