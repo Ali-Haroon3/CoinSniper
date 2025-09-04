@@ -1,0 +1,233 @@
+{
+  "app": {
+    "name": "CoinSniper",
+    "version": "1.0.0",
+    "port": 3000,
+    "environment": "development"
+  },
+  "database": {
+    "mongodb": {
+      "uri": "mongodb://localhost:27017/coinsniper",
+      "options": {
+        "useNewUrlParser": true,
+        "useUnifiedTopology": true,
+        "maxPoolSize": 10,
+        "serverSelectionTimeoutMS": 5000,
+        "socketTimeoutMS": 45000
+      }
+    },
+    "redis": {
+      "host": "localhost",
+      "port": 6379,
+      "password": null,
+      "db": 0,
+      "options": {
+        "retryDelayOnFailover": 100,
+        "maxRetriesPerRequest": 3,
+        "lazyConnect": true,
+        "keepAlive": 30000
+      }
+    }
+  },
+  "blockchain": {
+    "networks": {
+      "ethereum": {
+        "chainId": 1,
+        "name": "Ethereum Mainnet",
+        "rpc": "https://eth-mainnet.alchemyapi.io/v2/YOUR_API_KEY",
+        "explorer": "https://etherscan.io",
+        "enabled": true
+      },
+      "bsc": {
+        "chainId": 56,
+        "name": "Binance Smart Chain",
+        "rpc": "https://bsc-dataseed.binance.org",
+        "explorer": "https://bscscan.com",
+        "enabled": true
+      },
+      "polygon": {
+        "chainId": 137,
+        "name": "Polygon",
+        "rpc": "https://polygon-rpc.com",
+        "explorer": "https://polygonscan.com",
+        "enabled": true
+      },
+      "arbitrum": {
+        "chainId": 42161,
+        "name": "Arbitrum One",
+        "rpc": "https://arb1.arbitrum.io/rpc",
+        "explorer": "https://arbiscan.io",
+        "enabled": true
+      },
+      "base": {
+        "chainId": 8453,
+        "name": "Base",
+        "rpc": "https://mainnet.base.org",
+        "explorer": "https://basescan.org",
+        "enabled": true
+      }
+    },
+    "axiom": {
+      "apiKey": "YOUR_AXIOM_API_KEY",
+      "baseUrl": "https://api.axiom.xyz",
+      "enabled": true
+    }
+  },
+  "trading": {
+    "sniper": {
+      "enabled": true,
+      "maxConcurrentSnipes": 5,
+      "minLiquidityUSD": 1000,
+      "maxSlippage": 0.05,
+      "gasMultiplier": 1.2,
+      "priorityFee": "2",
+      "maxGasPrice": "100"
+    },
+    "risk": {
+      "maxPortfolioRisk": 0.05,
+      "maxDailyLoss": 0.10,
+      "maxDrawdown": 0.25,
+      "positionSizing": "KELLY",
+      "stopLossStrategy": "TRAILING",
+      "enableStopLoss": true,
+      "enableTakeProfit": true
+    },
+    "strategies": {
+      "conservative": {
+        "maxPositionSize": 0.03,
+        "stopLoss": 0.05,
+        "takeProfit": 0.15,
+        "minLiquidity": 50000
+      },
+      "balanced": {
+        "maxPositionSize": 0.05,
+        "stopLoss": 0.08,
+        "takeProfit": 0.25,
+        "minLiquidity": 25000
+      },
+      "aggressive": {
+        "maxPositionSize": 0.08,
+        "stopLoss": 0.12,
+        "takeProfit": 0.40,
+        "minLiquidity": 10000
+      }
+    }
+  },
+  "ai": {
+    "enabled": true,
+    "models": {
+      "sentiment": "rule-based",
+      "risk": "rule-based",
+      "opportunity": "rule-based"
+    },
+    "analysis": {
+      "liquidityWeight": 0.35,
+      "volumeWeight": 0.25,
+      "socialWeight": 0.20,
+      "securityWeight": 0.20,
+      "minConfidence": 0.6
+    },
+    "strategies": {
+      "conservative": {
+        "minScore": 80,
+        "maxRisk": 0.02
+      },
+      "balanced": {
+        "minScore": 70,
+        "maxRisk": 0.05
+      },
+      "aggressive": {
+        "minScore": 60,
+        "maxRisk": 0.08
+      }
+    }
+  },
+  "notifications": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "YOUR_TELEGRAM_BOT_TOKEN",
+      "chatId": "YOUR_TELEGRAM_CHAT_ID",
+      "notifyOnTrade": true,
+      "notifyOnAlert": true,
+      "notifyOnOpportunity": true
+    },
+    "discord": {
+      "enabled": false,
+      "webhookUrl": "YOUR_DISCORD_WEBHOOK_URL",
+      "notifyOnTrade": true,
+      "notifyOnAlert": true,
+      "notifyOnOpportunity": false
+    },
+    "email": {
+      "enabled": false,
+      "smtp": {
+        "host": "smtp.gmail.com",
+        "port": 587,
+        "secure": false,
+        "user": "your-email@gmail.com",
+        "pass": "your-app-password"
+      },
+      "recipients": ["your-email@gmail.com"],
+      "notifyOnTrade": true,
+      "notifyOnAlert": true,
+      "notifyOnOpportunity": false
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "https://your-webhook-url.com/coinsniper",
+      "secret": "your-webhook-secret",
+      "notifyOnTrade": true,
+      "notifyOnAlert": true,
+      "notifyOnOpportunity": false
+    }
+  },
+  "security": {
+    "api": {
+      "enabled": true,
+      "key": "YOUR_API_KEY",
+      "rateLimit": {
+        "windowMs": 900000,
+        "max": 100
+      }
+    },
+    "authentication": {
+      "jwt": {
+        "secret": "YOUR_JWT_SECRET",
+        "expiresIn": "24h"
+      }
+    },
+    "cors": {
+      "origin": ["http://localhost:3000", "https://yourdomain.com"],
+      "credentials": true
+    }
+  },
+  "monitoring": {
+    "logging": {
+      "level": "info",
+      "file": "logs/coinsniper.log",
+      "maxSize": "10m",
+      "maxFiles": "5"
+    },
+    "metrics": {
+      "enabled": true,
+      "interval": 60000,
+      "retention": "7d"
+    },
+    "health": {
+      "enabled": true,
+      "interval": 30000,
+      "timeout": 5000
+    }
+  },
+  "features": {
+    "multiWallet": true,
+    "backtesting": false,
+    "paperTrading": false,
+    "socialTrading": false,
+    "copyTrading": false,
+    "portfolioTracking": true,
+    "performanceAnalytics": true,
+    "riskAnalytics": true,
+    "marketInsights": true
+  }
+}

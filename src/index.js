@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const { logger } = require('./utils/logger');
-const { initializeDatabase } = require('./database/connection');
+const { connectDB } = require('./database/connection');
 const { initializeRedis } = require('./database/redis');
 const { initializeAxiom } = require('./services/axiom');
 const { initializeSniper } = require('./core/sniper');
@@ -51,7 +51,7 @@ class CoinSniper {
 
   async initializeServices() {
     // Initialize database connections
-    await initializeDatabase();
+    await connectDB();
     await initializeRedis();
     
     // Initialize Axiom service (primary data source)
@@ -101,8 +101,16 @@ class CoinSniper {
       });
     });
     
+    // Serve static files (dashboard)
+    this.app.use(express.static('public'));
+    
     // API routes
     this.app.use('/api', apiRoutes);
+    
+    // Dashboard route
+    this.app.get('/', (req, res) => {
+      res.sendFile(__dirname + '/../public/dashboard.html');
+    });
     
     // 404 handler
     this.app.use('*', (req, res) => {

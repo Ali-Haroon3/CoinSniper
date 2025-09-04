@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinSniper Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-online { background-color: #10b981; }
+        .status-offline { background-color: #ef4444; }
+        .status-warning { background-color: #f59e0b; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-rocket text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold">CoinSniper</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="status-indicator status-online"></span>
+                    <span class="text-sm">System Online</span>
+                    <button id="refreshBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Profit</p>
+                        <p class="text-2xl font-bold text-gray-900" id="totalProfit">$0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Win Rate</p>
+                        <p class="text-2xl font-bold text-gray-900" id="winRate">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-coins text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Active Trades</p>
+                        <p class="text-2xl font-bold text-gray-900" id="activeTrades">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Risk Level</p>
+                        <p class="text-2xl font-bold text-gray-900" id="riskLevel">LOW</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Trading Opportunities -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">Top Trading Opportunities</h2>
+                        <button id="refreshOpportunities" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-sync-alt mr-2"></i>Refresh
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Token</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">AI Score</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Risk</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Liquidity</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="opportunitiesTable">
+                                <tr>
+                                    <td colspan="5" class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-spinner fa-spin text-2xl mb-4 block"></i>
+                                        Loading opportunities...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Trades -->
+                <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">Recent Trades</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Token</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Type</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Amount</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">P&L</th>
+                                    <th class="text-left py-3 px-4 font-medium text-gray-700">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTradesTable">
+                                <tr>
+                                    <td colspan="5" class="text-center py-8 text-gray-500">
+                                        <i class="fas fa-spinner fa-spin text-2xl mb-4 block"></i>
+                                        Loading trades...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Controls & Analytics -->
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+                    <div class="space-y-3">
+                        <button id="startSniper" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-play mr-2"></i>Start Sniper
+                        </button>
+                        <button id="stopSniper" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-stop mr-2"></i>Stop Sniper
+                        </button>
+                        <button id="testNotification" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-bell mr-2"></i>Test Notification
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Risk Management -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">Risk Management</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Max Portfolio Risk</label>
+                            <input type="range" id="maxRisk" min="1" max="20" value="5" class="w-full">
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>1%</span>
+                                <span id="riskValue">5%</span>
+                                <span>20%</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Strategy Mode</label>
+                            <select id="strategyMode" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option value="CONSERVATIVE">Conservative</option>
+                                <option value="BALANCED" selected>Balanced</option>
+                                <option value="AGGRESSIVE">Aggressive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">System Status</h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">AI Manager</span>
+                            <span class="status-indicator status-online"></span>
+                            <span class="text-sm font-medium text-green-600">Online</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Risk Manager</span>
+                            <span class="status-indicator status-online"></span>
+                            <span class="text-sm font-medium text-green-600">Online</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Notifications</span>
+                            <span class="status-indicator status-online"></span>
+                            <span class="text-sm font-medium text-green-600">Online</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Database</span>
+                            <span class="status-indicator status-online"></span>
+                            <span class="text-sm font-medium text-green-600">Online</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">Profit/Loss Over Time</h2>
+                <canvas id="pnlChart" width="400" height="200"></canvas>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">Trade Success Rate</h2>
+                <canvas id="successChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notificationToast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="notificationMessage">Operation completed successfully</span>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = '/api';
+        const API_KEY = 'your-api-key-here'; // In production, this would be securely managed
+
+        // Global state
+        let dashboardData = {
+            opportunities: [],
+            recentTrades: [],
+            performance: {},
+            riskMetrics: {}
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            setupEventListeners();
+            loadDashboardData();
+        });
+
+        function initializeDashboard() {
+            // Initialize charts
+            initializeCharts();
+            
+            // Set up auto-refresh
+            setInterval(loadDashboardData, 30000); // Refresh every 30 seconds
+        }
+
+        function setupEventListeners() {
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', loadDashboardData);
+            
+            // Opportunities refresh
+            document.getElementById('refreshOpportunities').addEventListener('click', loadOpportunities);
+            
+            // Quick action buttons
+            document.getElementById('startSniper').addEventListener('click', startSniper);
+            document.getElementById('stopSniper').addEventListener('click', stopSniper);
+            document.getElementById('testNotification').addEventListener('click', testNotification);
+            
+            // Risk management controls
+            document.getElementById('maxRisk').addEventListener('input', updateRiskSettings);
+            document.getElementById('strategyMode').addEventListener('change', updateStrategyMode);
+        }
+
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadPerformance(),
+                    loadRiskMetrics(),
+                    loadOpportunities(),
+                    loadRecentTrades()
+                ]);
+                
+                updateDashboardUI();
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                showNotification('Failed to load dashboard data', 'error');
+            }
+        }
+
+        async function loadPerformance() {
+            const response = await fetch(`${API_BASE}/analytics/performance?timeframe=7d`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+            
+            if (response.ok) {
+                dashboardData.performance = await response.json();
+            }
+        }
+
+        async function loadRiskMetrics() {
+            const response = await fetch(`${API_BASE}/analytics/risk`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+            
+            if (response.ok) {
+                dashboardData.riskMetrics = await response.json();
+            }
+        }
+
+        async function loadOpportunities() {
+            const response = await fetch(`${API_BASE}/tokens/opportunities/top?limit=10&minScore=70`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                dashboardData.opportunities = data.opportunities;
+            }
+        }
+
+        async function loadRecentTrades() {
+            const response = await fetch(`${API_BASE}/trades?limit=10`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                dashboardData.recentTrades = data.trades;
+            }
+        }
+
+        function updateDashboardUI() {
+            // Update stats
+            if (dashboardData.performance) {
+                document.getElementById('totalProfit').textContent = formatCurrency(dashboardData.performance.totalProfit || 0);
+                document.getElementById('winRate').textContent = `${(dashboardData.performance.winRate || 0).toFixed(1)}%`;
+                document.getElementById('activeTrades').textContent = dashboardData.recentTrades.filter(t => t.status === 'PENDING').length;
+            }
+            
+            if (dashboardData.riskMetrics) {
+                document.getElementById('riskLevel').textContent = dashboardData.riskMetrics.riskLevel || 'LOW';
+            }
+            
+            // Update opportunities table
+            updateOpportunitiesTable();
+            
+            // Update recent trades table
+            updateRecentTradesTable();
+            
+            // Update charts
+            updateCharts();
+        }
+
+        function updateOpportunitiesTable() {
+            const tbody = document.getElementById('opportunitiesTable');
+            
+            if (dashboardData.opportunities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No opportunities found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = dashboardData.opportunities.map(token => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <div>
+                            <div class="font-medium text-gray-900">${token.symbol}</div>
+                            <div class="text-sm text-gray-500">${token.address.substring(0, 8)}...</div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            ${token.sniperScore}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRiskBadgeClass(token.riskScore)}">
+                            ${getRiskLevel(token.riskScore)}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-900">${token.formattedLiquidity || 'N/A'}</td>
+                    <td class="py-3 px-4">
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium" onclick="analyzeToken('${token.address}')">
+                            Analyze
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateRecentTradesTable() {
+            const tbody = document.getElementById('recentTradesTable');
+            
+            if (dashboardData.recentTrades.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No trades found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = dashboardData.recentTrades.map(trade => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <div class="font-medium text-gray-900">${trade.tokenSymbol}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${trade.tradeType === 'BUY' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${trade.tradeType}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-900">${trade.amount}</td>
+                    <td class="py-3 px-4">
+                        <span class="text-sm font-medium ${trade.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${formatCurrency(trade.profitLoss || 0)}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(trade.status)}">
+                            ${trade.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getRiskBadgeClass(riskScore) {
+            if (riskScore >= 70) return 'bg-green-100 text-green-800';
+            if (riskScore >= 40) return 'bg-yellow-100 text-yellow-800';
+            return 'bg-red-100 text-red-800';
+        }
+
+        function getRiskLevel(riskScore) {
+            if (riskScore >= 70) return 'LOW';
+            if (riskScore >= 40) return 'MEDIUM';
+            return 'HIGH';
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'CONFIRMED': return 'bg-green-100 text-green-800';
+                case 'PENDING': return 'bg-yellow-100 text-yellow-800';
+                case 'FAILED': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+
+        // Quick action functions
+        async function startSniper() {
+            try {
+                showNotification('Starting sniper...', 'info');
+                // API call would go here
+                setTimeout(() => showNotification('Sniper started successfully', 'success'), 1000);
+            } catch (error) {
+                showNotification('Failed to start sniper', 'error');
+            }
+        }
+
+        async function stopSniper() {
+            try {
+                showNotification('Stopping sniper...', 'info');
+                // API call would go here
+                setTimeout(() => showNotification('Sniper stopped successfully', 'success'), 1000);
+            } catch (error) {
+                showNotification('Failed to stop sniper', 'error');
+            }
+        }
+
+        async function testNotification() {
+            try {
+                const response = await fetch(`${API_BASE}/system/notifications/test`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({ channel: 'telegram' })
+                });
+                
+                if (response.ok) {
+                    showNotification('Test notification sent successfully', 'success');
+                } else {
+                    showNotification('Failed to send test notification', 'error');
+                }
+            } catch (error) {
+                showNotification('Failed to send test notification', 'error');
+            }
+        }
+
+        function updateRiskSettings() {
+            const riskSlider = document.getElementById('maxRisk');
+            const riskValue = document.getElementById('riskValue');
+            riskValue.textContent = riskSlider.value + '%';
+            
+            // API call to update risk settings would go here
+            showNotification('Risk settings updated', 'success');
+        }
+
+        function updateStrategyMode() {
+            const strategyMode = document.getElementById('strategyMode').value;
+            // API call to update strategy mode would go here
+            showNotification(`Strategy mode updated to ${strategyMode}`, 'success');
+        }
+
+        function analyzeToken(address) {
+            showNotification(`Analyzing token ${address.substring(0, 8)}...`, 'info');
+            // Token analysis logic would go here
+        }
+
+        // Chart functions
+        function initializeCharts() {
+            // P&L Chart
+            const pnlCtx = document.getElementById('pnlChart').getContext('2d');
+            window.pnlChart = new Chart(pnlCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Profit/Loss',
+                        data: [],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Success Rate Chart
+            const successCtx = document.getElementById('successChart').getContext('2d');
+            window.successChart = new Chart(successCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Successful', 'Failed'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#10b981', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function updateCharts() {
+            // Update P&L chart with sample data
+            if (window.pnlChart) {
+                const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                const data = [0, 150, -50, 300, 100, -75, 200];
+                
+                window.pnlChart.data.labels = labels;
+                window.pnlChart.data.datasets[0].data = data;
+                window.pnlChart.update();
+            }
+
+            // Update success rate chart
+            if (window.successChart && dashboardData.performance) {
+                const successRate = dashboardData.performance.winRate || 0;
+                const failRate = 100 - successRate;
+                
+                window.successChart.data.datasets[0].data = [successRate, failRate];
+                window.successChart.update();
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const toast = document.getElementById('notificationToast');
+            const messageEl = document.getElementById('notificationMessage');
+            
+            messageEl.textContent = message;
+            
+            // Update colors based on type
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                type === 'warning' ? 'bg-yellow-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            
+            // Show toast
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
