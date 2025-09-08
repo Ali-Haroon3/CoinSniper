@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const appConfig = require('../config.json');
 
 const { logger } = require('./utils/logger');
 const { connectDB } = require('./database/connection');
@@ -72,10 +73,11 @@ class CoinSniper {
     this.app.use(cors());
     this.app.use(compression());
     
-    // Rate limiting
+    // Rate limiting (config-driven)
+    const apiRateLimit = (appConfig && appConfig.security && appConfig.security.api && appConfig.security.api.rateLimit) || {};
     const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP to 100 requests per windowMs
+      windowMs: apiRateLimit.windowMs || 15 * 60 * 1000, // default 15 minutes
+      max: apiRateLimit.max || 100, // default 100 requests per window
       message: 'Too many requests from this IP, please try again later.'
     });
     this.app.use('/api/', limiter);
