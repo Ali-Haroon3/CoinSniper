@@ -337,6 +337,21 @@ This tool is for educational purposes. Trading cryptocurrencies involves signifi
 - **Discord**: [Join our community](https://discord.gg/coinsniper)
 - **Telegram**: [@CoinSniperSupport](https://t.me/CoinSniperSupport)
 
+## 📅 Recent Updates
+
+### Version 1.2.0 (Latest)
+- **Enhanced AI Analysis**: Improved token scoring algorithm with better accuracy
+- **New Risk Metrics**: Added VaR calculations and Sharpe ratio analysis
+- **Performance Boost**: 40% faster token detection and analysis
+- **UI Improvements**: Updated dashboard with better real-time charts
+- **Bug Fixes**: Resolved issues with multi-chain support and notification delays
+
+### Version 1.1.0
+- **Multi-Wallet Support**: Added support for managing multiple trading wallets
+- **Advanced Notifications**: Enhanced Telegram and Discord integration
+- **Backtesting Engine**: New historical strategy testing capabilities
+- **Security Updates**: Improved API authentication and rate limiting
+
 ## 🎉 Acknowledgments
 
 - Axiom team for blockchain data infrastructure
