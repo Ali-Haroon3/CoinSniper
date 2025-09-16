@@ -339,7 +339,12 @@ This tool is for educational purposes. Trading cryptocurrencies involves signifi
 
 ## 📅 Recent Updates
 
-### Version 1.2.0 (Latest)
+### Version 1.3.0 (Latest)
+- **Updated Documentation**: Enhanced README with better formatting and clarity
+- **Improved User Experience**: Streamlined installation and configuration process
+- **Code Quality**: Better code organization and documentation
+
+### Version 1.2.0
 - **Enhanced AI Analysis**: Improved token scoring algorithm with better accuracy
 - **New Risk Metrics**: Added VaR calculations and Sharpe ratio analysis
 - **Performance Boost**: 40% faster token detection and analysis
